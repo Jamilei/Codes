@@ -1,0 +1,290 @@
+// Made by Jami Leivo / 2013 / Marraskuu
+
+
+/**
+ * Tein taulukon hajautuksen fiksulla tavalla joka ei toiminut aivan täydellisesti.
+ * Taulukko jaetaan jokaiselle annetulle säikeelle (käyttäjä itse pystyy määräämään säikeitten määrän)
+ * tasaisen määrän alkioita, paitsi viimeiselle jolle tulee vähän enemmän työtä. (Desimaalin pyöristys rivillä 103)
+ *
+ * Jako tapahtuu jakamalla taulukko säikeitten määrän mukaan osiin (missä säikeitä ei voi olla enemmän kuin pituutta on).
+ * ja tekemällä jokaiselle säikeelle tarkan indeksoinnin missä ne tekee työnsä.
+ * 
+ * Tästä johtuu että summa ei aina annakaan oikeaa arvoa. Missä monimutkainen ratkaisuni toimii periaatteen tasolla
+ * ei se toimi enää käytännössä.
+ *
+ * Oikeellisen tuloksen se antaa "input: 7, 10, 2, 1", mutta esimerkiksi kahdeksalla säikeellä se antaa tulosta liikaa.
+ * Vaikka kuinka yritin tarkistaa tietojen oikeellisuutta en löytänyt kohtaa missä vika oli.
+ *
+ * Suojaukset on kohillaan (lukko) ja vaihdon summan käytön summataulukkoon että se ei käsittele samaa muuttujaa vahingossakaan.
+ * Vika on todennäköisesti jotenkin liitoksissa säikeitten määrään.
+ *
+ * Muuten toiminnallisuus on hyvällä tasolla, kunhan tuon summan saisi oikeelliseksi niin kaikki ok.
+ *
+ *
+ **/
+
+
+
+
+
+
+import java.util.Scanner;
+import java.lang.Thread;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class haj13_p1 extends Thread {
+	
+	static private final ReentrantLock lukko = new ReentrantLock();
+	/** -1 KOSKA*/
+	static int sum = -1;
+	static int[] summataulu;
+
+    public static void main(String[] args) {
+
+
+		//saikeiden lukumaara, kayttaja maarittelee.
+        int saikeet; //P
+		int rivit; //R
+		int sarakkeet; //S
+		int matr_luvut; //L
+
+        Scanner input = new Scanner(System.in);
+
+
+        //Pyydetään käyttäjältä mainitut tiedot
+        System.out.println("Kuinka monella säikeellä haluat ohjelman suoritettavaksi: ");
+        saikeet = input.nextInt();
+        
+        //Tehdään summatauluun jokaiselle säikeelle oma index kohta johon laskea summaa
+        summataulu = new int[saikeet];
+
+		System.out.println("Kuinka suuri taulukko tehdään?");
+		System.out.println("Rivien lukumäärä: ");
+        rivit = input.nextInt();
+        System.out.println("Sarakkeiden lukumäärä: ");
+        sarakkeet = input.nextInt();
+        
+        System.out.println("Matriisin luvut: ");
+        matr_luvut = input.nextInt();
+
+
+        
+
+        haj13_p1 t = new haj13_p1();
+        
+		//Tehdään taulu
+        int[][] T = t.luotaulu(rivit, sarakkeet, matr_luvut);
+
+		
+
+		int i;
+		int a;
+        
+        //muuttujat jotka määtää jokaiselle säikeelle laskettavan alueen
+        int ekaalku = 0; //taulukko alkaa nollasta  T[*][]
+        int tokaalku = 0; //taulukko alkaa nollasta  T[][*]
+        int ekaloppu = 0; // T[*][] eli mihin asti otetaan taulukosta
+        int tokaloppu = 0; // T[][*] eli mihin asti otetaan taulukosta
+        
+        //taulukon koko
+        int pituus = T.length;
+        int sarakket = T[0].length;
+        pituus = pituus * sarakkeet;
+        
+        
+        
+        //kuinka suuri osa annetaan kullekin säikeelle
+        //jos saikeita on enemmän mitä alkioita vähennetään säikeitä
+        if(saikeet > pituus){
+        	saikeet = pituus;
+        }
+        double d_osakoko = Math.floor(pituus/saikeet);
+       /** System.out.println("osataulukon koko desimaaleina");
+        System.out.println(d_osakoko);*/
+        int osakoko = (int)d_osakoko;
+        
+        
+        
+        /** Arvot oikeita muuta ei osaa laskea
+        System.out.println("Saikeita on");
+        System.out.println(saikeet);
+        System.out.println("Pituus on");
+        System.out.println(pituus);
+        System.out.println("Sarakkeita on");
+        System.out.println(sarakket);
+        System.out.println("osataulun koko");
+        System.out.println(osakoko); */
+        
+        //tehdään saikeiden verran säikeitä
+        for(i = 0; i < saikeet; i++){
+   	
+        	/**Jokaiselle säikeelle annnetaan "osakoko"-muuttujan verran taulukosta
+        	 *joka on taulukko jaettu säikeiden koon mukaan.
+        	 *Lisätään osoittimia eteenpäin osakoon verran että seuraava säie saa
+        	 *saman kokoisen osan taulukosta mutta ei samaa kokoa.
+        	 *
+        	 *Leikitään siis taulukon indekseillä jossa (eka, toka)alut ja -loput on jokaisen säikeen rangeja */
+        	 int b;
+        	 //antaa taulukosta osakoon verran lukuja
+        	 for(b = 0; b < osakoko; b++){
+        	 	
+        	 	//jos viimeinen säie niin annetaan loppu taulukko
+        	 	if(i == saikeet-1){
+        	 		tokaloppu = sarakket;
+        	 		ekaloppu = pituus;
+        	 	}
+        	 	// jos ollaan taulukon rivin lopussa
+        	 	else if(tokaalku == sarakket){
+        	 		ekaloppu++;
+        	 		tokaloppu = 0; 		
+        	 	}
+        	 	// muuten vain liikutaan rivillä eteenpäin
+        	 	else{
+        	 		tokaloppu++;
+        	 	}
+        	 	
+        	 }       	
+        	
+        	
+        	//käynnistetään säie ja määritellään sille sen laskettava alue       	
+        	Laskija saie = new haj13_p1().new Laskija(T, ekaalku, tokaalku, ekaloppu, tokaloppu, osakoko, i);
+       
+        	saie.start();
+        	
+        	
+        	//seuraavalle säikeelle määritellään seuraavat alut ja loput (+1 tokaalkuun)
+        	if(tokaalku == sarakket){
+        		ekaalku++;
+        		tokaalku = 0;
+        	}
+        	else{
+        	ekaalku = ekaloppu;
+        	tokaalku = tokaloppu + 1;
+        	}
+        	
+        	
+        	
+        }
+
+
+
+
+
+		/**
+        // verrataan peräkkäistä ja rinnakkaista laskentaa
+
+        System.out.println("Peräkkäin: " + t.summaa_per(T));
+        System.out.println("Rinnakkain: " + t.summaa(T, saikeet));*/
+        
+        
+        int g;
+        
+        /** Laskee summatauluun jokaisen säikeen laskeman osasumman*/
+        for(g = 0; g < saikeet; g++){
+        	sum = sum + summataulu[g];
+        }
+        
+		
+		System.out.println("Summa on: " + sum);
+		
+    }   // main()
+    
+    
+    
+
+
+    // generoi r x s matriisin, lukuina x
+    int[][] luotaulu(int r, int s, int x) {
+        int k = 1;
+        int T[][] = new int[r][];
+        for (int i = 0; i < r; i++) {
+            T[i] = new int[s];
+            for (int j = 0; j < s; j++) {
+                T[i][j] = (x==0) ? k++ : x;
+                System.out.println(T[i][j]);
+            }
+        }
+        return T;
+    }   // luotaulu()
+
+
+    // peräkkäinen summaus vertailun vuoksi
+    int summaa_per(int[][] T) {
+        int sum = 0;
+        for (int i = 0; i < T.length; i++)
+            for (int j = 0; j < T[i].length; j++)
+                sum += T[i][j];
+        return sum;
+    }  // summaa_per()
+    
+    
+    
+
+
+    /** Ei tee mitään :3 */
+    int summaa(int[][] T, int saikeet){
+
+        int sum = 0;
+        return sum;
+    }
+
+
+
+    /** Säikeen summaaja*/
+    class Laskija extends Thread {
+        int[][] Syote;
+        	
+
+		/** Laskija nimenmukaisesti
+		 *saa parametrina taulukon mistä laskea, indexit mistä laskea
+		 *sekä "index" muuttujan jota hyödynnetään summataulun käytössä */
+        public Laskija(int[][] S, int ekaalku, int tokaalku, int ekaloppu, int tokaloppu, int osakoko, int index){
+            int i;
+            int a;
+            
+            			
+			/** Summaus operaatio
+			 *Käy taulukkoa sille määrätyn alueen verran ja lisää summatauluun jokaisen indexin arvon
+			 */
+			
+			
+        	for(a = 0; a < osakoko+1; a++){
+        		/**System.out.println("Lisätään arvo");
+        		System.out.println(sum);
+        		System.out.println("Pienempi index");
+        		System.out.println(tokaalku);*/
+        		if(tokaalku >= S[0].length){
+        			tokaalku = (S[0].length)-1;
+        		}
+        		if(ekaalku >= S.length){
+        			ekaalku = (S.length)-1;
+        		}
+        		lukko.lock();
+        		summataulu[index] = summataulu[index] + S[ekaalku][tokaalku];
+        		lukko.unlock();
+        		if(tokaalku == ((S[0].length)-1)){
+        			/**System.out.println("Lasketaan tokaalku nollaan");*/
+        			tokaalku = 0;
+        			ekaalku++;
+        		}
+        		else{
+        			tokaalku++;
+        			/**System.out.println("Nostetaan tokaalkua");*/
+        		}	
+        	}
+            	
+            
+            
+            
+            
+        }
+
+        public void run() {
+				
+		//hei olen run, en tee mitään :3
+
+        }
+
+    }
+
+}
