@@ -1,0 +1,126 @@
+/**
+ * @(#)Graph.java
+ * @author Jami Leivo
+ * @version 1.00 2014/4/7
+ */
+
+
+import java.util.*;
+import java.io.File;
+
+public class Graph<L,W> {
+	
+	//muuttuja kohtaloiden maaralle
+	static int maara;
+	//alkusolmu
+	Vertex alku;
+	
+	protected class Vertex { // solmu
+		L label; // solmun nimi
+		LinkedList<Edge> adjacent; // naapurit vieruslistaan
+		Vertex (L label) {
+			this.label = label;
+			adjacent = new LinkedList<Edge>();
+		}
+	}
+	
+	public Vertex getVertex(L label){
+		return vertices.get(label);
+	}
+	
+	protected class Edge { // kaari
+		Vertex head; // johtaa solmuun head
+		W weight; // paino
+		Edge (Vertex head, W weight) {
+			this.head = head;
+			this.weight = weight;
+		}
+		
+		public Vertex getVertex(){
+			return this.head;
+		}
+	}
+	
+	protected LinkedHashMap<L,Vertex> vertices;
+	
+	Graph () { 
+		vertices = new LinkedHashMap<L,Vertex> (); 
+	}
+	
+	
+	public Vertex addVertex (L label) {
+		Vertex v = vertices.get (label);
+		if (v == null) { // jos v != null, niin on jo verkossa...
+			v = new Vertex (label); // ...muten luodaan uusi solmu...
+			vertices.put (label, v); // ...ja lisätään se
+		}
+		return v;
+	}
+	
+	public void addEdge (L u, L v, W weight) { // lisätään kaari u -- v
+		Vertex uu = addVertex (u); // tavittaessa lisätään solmutkin,
+		Vertex vv = addVertex (v); // tai saadaan viitteet vanhoihin
+		uu.adjacent.add (new Edge (vv, weight)); // u --> v
+		//vv.adjacent.add (new Edge (uu, weight)); // u <-- v
+	}
+	
+	public void kohtalot (Vertex verkko) {
+		
+		//tarkistetaan ensin jos ollaan paatepisteessa
+		if(verkko.adjacent.isEmpty()){
+			//yksi kohtalosarja kayty
+			maara++;
+		}
+		
+		//ollaan viela jossain missa solmuja loytyy
+		else{
+			for(Edge e : verkko.adjacent){
+				kohtalot(e.getVertex());
+			}
+		}
+		
+	}
+	
+	public static void main (String[] args) throws Exception {
+		
+		//luodaan graafi josta lopussa lasketaan kohtalot
+		Graph graafi = new Graph<Integer, Integer>();
+		
+		//luetaan tiedosto
+		Scanner	sc = new Scanner (new File ("kohtalo.txt"));
+		
+		//luetaan ensimmainen luku
+		int luku = sc.nextInt();
+		//System.out.println(luku);
+		
+		//solmu josta piirretään kaari
+		int u = 0;
+		
+		//pyorii ensimmaisen luetun luvun verran
+		for(int e = 0; e < luku; e++){
+			
+			//yhden rivin tapahtumat
+			int rivilkm = sc.nextInt();
+			for(int i = 0; i < rivilkm; i++){
+				
+				//luetaan tapahtuma ja tehdään kaari 
+				//rivinumeron ja syotteen valille
+				int v = sc.nextInt();
+				graafi.addEdge(u, v, 0);
+			}
+			//rivi luettu, siirrytään seuraavaan
+			u++;
+		}
+		
+		//asetetaan lahtosolmu
+		graafi.alku = graafi.getVertex(0);
+		//ruvetaan kaymaan lapi
+		graafi.kohtalot(graafi.alku);	
+		
+		//lopuksi tulostetaan kohtaloiden laskettu maara
+		System.out.println(maara);
+		
+	}
+
+
+}
