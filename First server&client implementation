@@ -1,0 +1,292 @@
+/**
+ *Jami Leivo
+ *Jou 2013
+ *
+ *
+ *Ohjelma toimii yhteydessa HarjTyoAsiakas ohjelman kanssa.
+ *Palvelin osa ottaa vastaan asiakkaita ja reitittaa asiakkaitten viestit 
+ *jokaiselle palvelimella olevalle asiakkkaalle.
+ *
+ *Ohjelma toimii miestani mallikkaasti. Asiakkaat otetaan mielellaan vastaan
+ *ja heita palvellaan oikealla tavalla. Kaikki mukana olijat saavat kaikki viestit.
+ *Asiakkaan poistaminen onnistuu mutta siina kaytetaan pienta bruteforcea.
+ *Se toimii kaytannossa mutta ei kaikkien taiteellisten mallien mukaisesti.
+ *
+ */
+
+//importit
+import java.net.*;
+import java.util.*;
+import java.io.PrintWriter;
+import java.io.IOException;
+
+public class HarjTyoPalvelin {
+	
+	//Kuunteleva sokketti
+	ServerSocket ss = null;
+	//Lista jonnekka laitetaan asiakkaat
+	static LinkedList<palveleAsiakasta> palvelijat = null;	
+	
+	
+	//maini, luodaan asiakkaille lista ja portti. otetaan yhteys porttiin
+	public static void main(String args[]){
+		
+		//portti
+		int portti = 12345;
+		palvelijat = new LinkedList<palveleAsiakasta>();
+		
+		//yritetään luoda yhteys
+		try{
+			HarjTyoPalvelin palv = new HarjTyoPalvelin();
+			palv.kuuntele(portti);
+		}
+		catch(Exception e){
+			System.out.println("Yhteyttä ei saatu muodostettua" + e);
+		}		
+	}
+	
+	//palvelimen toiminta, kuuntelee uusia yhteyksia ja lisaa ne listaan.
+    public void kuuntele(int portti) throws IOException {
+    	
+		//aloitetaan 'palveleminen'
+		ss = new ServerSocket(portti);
+    	System.out.println("Kuunnellaan porttia: " + portti);
+    	
+    	try{
+	    	while(true){
+	    		Socket cs = ss.accept();
+	    		//lisää uuden saikeen kun asiakas liittyy palvelimelle
+	    		//Lisataan asiakas listaan jotta saadaan seurattua sita keta on palvelimeen yhdistyneena
+	    		palveleAsiakasta uusi = new palveleAsiakasta(cs);
+	    		palvelijat.add(uusi);
+	    	}
+    	}
+	    catch(Exception e){
+	    	System.out.println("Tapahtui virhe uuden asiakkaan lisaamisessa" + e);
+	    }
+    }
+    
+    
+    //lahettaa 'viestin' jokaiselle listassa olevalle asiakkaalle
+    void lahetaViesti(String viesti){
+
+    	int i;
+    	//listan koko
+    	int koko = palvelijat.size();
+    	
+    	//for looppi joka lahettaa saadun viestin kaikille palvelimella olijoille
+    	//synkataan etta ei paallekkaisia kayttoja
+    	synchronized(palvelijat) {
+    		for(i = 0; i < koko; i++){
+	    		palvelijat.get(i).out.println(viesti);
+    		}
+    	}
+    }
+    
+    //poistaa asiakkaan listasta ja sulkee yhteyden
+    void poistaAsiakas(Socket asiakas){
+    	
+    	try{
+    		//poistetaan asiakas 'palvelijat' listasta
+    		palvelijat.remove(asiakas);
+    		//suljetaan yhteys
+    		asiakas.close();
+    		System.out.println("Asiakas poistettu");
+    	}
+    	catch(Exception e){
+    		System.out.println("Tapahtui virhe asiakasta poistaessa" + e);
+    	}
+    }
+    
+    
+    
+    
+    //Asiakkaan palveleminen tapahtuu taalla
+    public class palveleAsiakasta extends Thread {
+    	
+    	//muuttujien maarittelya
+    	HarjTyoPalvelin palvelin;
+    	Socket asiakas;
+    	PrintWriter out;
+    	
+    	
+    	//maaritellaan uusi asiakas ja kaynnistetaan saie
+    	public palveleAsiakasta(Socket aAsiakas){
+    		this.asiakas = aAsiakas;
+    		start();	
+    	}
+    	
+    	
+    	//asiakkaitten kuuntelu, 'palveleminen'
+    	public void run(){
+    		String viesti = "";
+    		
+    		try{
+    			//ilmoitus uudesta asiakkaasta			
+    			System.out.println("Uusi asiakas osoitteesta: " + asiakas.getInetAddress() + ". Porttina: " + asiakas.getPort());
+    			
+    			//luodaan virrat			
+    			Scanner in = new Scanner(asiakas.getInputStream());
+    			out = new PrintWriter(asiakas.getOutputStream(), true);
+    			
+    			//lahetetaan asiakkaalle saapumusviesti
+    			out.println("Yhteys muodostettu. Poistu kirjoittamalla END");
+    			
+    			while(in.hasNext()){
+    				//luetaan asiakkaalta viesti ja tulostetaan se palvelimelle
+    				viesti = in.nextLine();
+    				System.out.println(asiakas.getInetAddress() + " sanoi: " + viesti);
+    				
+    				//lahetetaan saatu viesti kaikille chatissa olijoille
+    				lahetaViesti(asiakas.getInetAddress() + " : Sanoo: " + viesti);
+    			}
+    		}
+    		
+    		catch(Exception e){
+    			System.out.println("Asiakkaan palvelemisessa tapahtui virhe" + e);
+    			e.printStackTrace();
+    		}
+    		
+    		//poistetaan asiakas listalta
+    		poistaAsiakas(asiakas);
+    	}
+    	
+    	
+    }
+    
+    
+    
+}
+
+
+
+
+
+___________________________________________________________
+___________________________________________________________
+
+
+
+
+HarjTyoAsiakas.java
+
+
+
+/**
+ *Jami Leivo
+ *Jou 2013
+ */
+
+import java.net.*;
+import java.util.*;
+import java.io.PrintWriter;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
+public class HarjTyoAsiakas implements Runnable {
+	
+	//keskusteluun tarvittavat tulostus tyokalut
+	//maaritellaan taalla etta runissa voi kayttaa
+	static PrintWriter out;
+    static BufferedReader in;
+    //sokketti joka pitaa yhteyden palvelimeen
+	private Socket s = null;
+	
+	public static void main(String args[]){
+		
+		//asetetaan portti sekä ip
+		int portti = 12345;
+		String osoite = "localhost";
+		
+		//luodaan yhteys palvelimeen
+		HarjTyoAsiakas asiakas = new HarjTyoAsiakas();
+		asiakas.otaYhteys(portti, osoite);
+		
+	}
+	
+	
+	//mita tehdaan yhteyden muodostamisen jalkeen
+    public boolean otaYhteys(int portti, String osoite) {
+    	
+    	//scanneri syotteita varten
+    	Scanner kayttaja = new Scanner(System.in); 	
+
+    	//sokketti joka pitaa yhteyden palvelimeen
+    	Socket s = null;
+    	
+    	//muuttuja viestia varten, alustetaan vikojen estamiseksi
+    	String viesti = "";
+    	
+    	//otetaan yhteys
+    	try{
+    		
+    		s = new Socket(osoite, portti);
+    		System.out.println("Yhteyden luominen onnistui");
+    		
+    		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+    		out = new PrintWriter(s.getOutputStream(), true);
+    		
+    		//aloitetaan saie joka oottaa vastaan palvelimen viesteja
+    		Thread saie = new Thread(this);
+    		saie.start();
+    		
+    		//aloitetaan asiakkaan kuunteleminen
+    		while(true){
+    			viesti = kayttaja.nextLine();
+    			//jos viesti on 'END' niin lopetetaan
+    			if(viesti.equals("END")){
+    				//lahetetaan palvelimelle lopetus-viesti ennen kuin suljetaan yhteys
+    				out.println("END");
+    				s.close();
+    				//bruteforce ratkaisu, sammuttaa ohjelman suorituksen
+    				System.exit(0);
+    			}
+    			//muulloin lahetetaan viesti normaalisti
+    			else{
+    				out.println(viesti);
+    			}
+    		}
+    		
+    	}
+    	
+    	catch(Exception e){
+    		System.out.println("Tapahtui virhe" + e);
+    	}
+    	
+   		return true;
+    	
+    	
+    }
+    
+    //kuuntelee palvelinta ja tulostaa sen ja muitten kayttajien viestit
+    public void run(){
+    	
+    	try{
+			//luetaan niin kauan kun saie on paalla
+			while(true){
+				String msg = in.readLine();
+				
+				//ei tulosteta jos palauttaa nullia
+				if(msg != null){
+					System.out.println(msg);
+					
+				}
+			}
+    	}
+    	
+    	//laiskan miehen virheidenkasittely
+    	catch(SocketException e){
+    		System.out.println("Yhteys suljettu");
+    	}
+    	catch(Exception e){
+    		System.out.println("Virhe palvelimen kuuntelemisessa" + e);
+    		 e.printStackTrace();
+    	}
+    	
+    	
+    }
+    
+    
+}
+
+
