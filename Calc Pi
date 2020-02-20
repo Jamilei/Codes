@@ -1,0 +1,48 @@
+
+import java.util.*;
+	 
+public class LaskePii{  
+
+	//tarkistaa onko heitetty piste ympyran sisalla
+	//vertaa pisteen pituutta keskipisteeseen, jos yli 1 niin ei ole sisalla.
+    public static boolean sisalla (double x, double y){   
+        double distance = Math.sqrt((x * x) + (y * y));
+        return (distance < 1.0);
+    }
+    
+    
+    //heittaa tikkaa annetun luvun verran
+    //arpoo randomilla osumakohdan ja tarkistetaan onko se ympyran sisalla
+    //lopuksi lasketaan kuinka suuri osa heitoista osui ympyran sisalle 
+    public static double laskePi (int heitot){  
+        Random randomi = new Random (System.currentTimeMillis());     
+        int osumat = 0;
+        double Pii = 0;      
+         
+        for (int i = 1; i <= heitot; i++){  
+            double x = (randomi.nextDouble());
+            double y = (randomi.nextDouble());
+            if (sisalla(x, y)){
+                osumat++;
+            }
+        }
+ 
+	    double doubleHeitot = heitot;
+	    Pii = (4.0 * (osumat/doubleHeitot));
+	    return Pii;
+    }
+
+	
+    public static void main (String[] args){
+        Scanner reader = new Scanner (System.in);
+
+        System.out.print("Montako kertaa heitetaan tikkaa: ");
+        int heitot = reader.nextInt();
+        
+        double Pii = laskePi(heitot);
+        double oikeaPii = Math.PI;
+        
+        System.out.println("Laskettu piin likiarvo: " + Pii);
+        System.out.println("Piin oikea arvo: " + oikeaPii);     
+    }
+}
