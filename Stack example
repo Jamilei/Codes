@@ -1,0 +1,112 @@
+/**
+ *
+ *	Puolalais notaation käyttöä pino menetelmällä.
+ *
+ * @author Jami Leivo
+ * @version 1.00 2013/9/24
+ */
+import java.util.Scanner;
+
+public class pinotin {
+	private int top;
+	private int[] avaimet;
+
+    public pinotin(int n){ 
+    	avaimet = new int [n]; 
+    	top = 0; 
+    }
+    
+    public void push(int a){
+    	avaimet [top++] = a;
+    }
+    
+    public int pop(){
+    	return avaimet [--top];
+    }
+    
+    public int peek(){
+    	return avaimet [top];
+    }
+    
+    public boolean empty(){
+    	return top == 0;
+    }    
+    
+    
+    public static void main(String[] args){
+    	Scanner input = new Scanner(System.in);
+    	
+ 		System.out.println("Syötä laskutoimitus");
+ 		String syote = input.nextLine();
+ 		String[] palat = syote.split(" ");
+ 		
+ 		pinotin pino = new pinotin(99);
+ 		
+
+ 		int n = 0;
+ 		int tulos = 0;
+ 		int x;
+ 		int y;
+ 		
+ 		for(int z = 0; z < palat.length; z = z + 1){
+ 			
+ 			if(palat[n].equals("+")){
+ 				x = pino.pop();
+ 				y = pino.pop();
+ 				tulos = x + y;
+ 				pino.push(tulos);
+ 				n = n + 1;
+ 			}
+ 			
+ 			else if(palat[n].equals("-")){
+ 				x = pino.pop();
+ 				y = pino.pop();
+ 				tulos = y - x;
+ 				pino.push(tulos);
+ 				n = n + 1;
+ 			}
+ 			
+ 			else if(palat[n].equals("*")){
+ 				x = pino.pop();
+ 				y = pino.pop();
+ 				tulos = x * y;
+ 				pino.push(tulos);
+ 				n = n + 1;
+ 				
+ 			}
+ 			
+ 			else if(palat[n].equals("/")){
+ 				x = pino.pop();
+ 				y = pino.pop();
+ 				tulos = x / y;
+ 				pino.push(tulos);
+ 				n = n + 1;
+ 				
+ 				
+ 			}
+ 			
+ 			else {
+ 				int luku = Integer.parseInt(palat[n]);
+ 				pino.push(luku);
+ 				n = n + 1;
+ 			}
+ 		}
+ 		
+ 		
+ 		System.out.println(pino.pop());	
+ 				
+ 		
+ 		
+ 		
+    }
+}
+
+/**
+ * Ohjelma on tehty yksinkertaisella tavalla jossa on vain yksi for-looppi
+ *
+ * Koodissa on kuitenkin myös syötteen sijoittaminen taulukkoon 
+ * joka nostaa aikavaatimuutta syötteen pituuden noustessa.
+ *
+ * Koodi toimii hyvin niin kauan kun syöte on toimivassa muodossa.
+ *
+ * Aikavaatimuus on O(n). */
