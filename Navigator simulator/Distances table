@@ -1,0 +1,41 @@
+#9.12.2012 Jami Leivo
+
+
+sanakirja={"rovaniemi":["oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "oulu":["rovaniemi", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "kuopio":["rovaniemi", "oulu", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "joensuu":["rovaniemi", "oulu", "kuopio", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "vaasa":["rovaniemi", "oulu", "kuopio", "joensuu", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "jyväskylä":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "tampere":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "pori":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "hämeenlinna":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"],
+           "lappeenranta":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "vantaa", "turku", "espoo", "helsinki"],
+           "vantaa":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "turku", "espoo", "helsinki"],
+           "turku":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "espoo", "helsinki"],
+           "espoo":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "helsinki"],
+           "helsinki":["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo"],}
+
+paikkakunnat = ["rovaniemi (0)", "oulu (1)", "kuopio (2)", "joensuu (3)", "vaasa (4)", "jyväskylä (5)", "tampere (6)", "pori (7)", "hämeenlinna (8)", "lappeenranta (9)", "vantaa (10)", "turku (11)", "espoo (12)", "helsinki (13)"]
+paikkakunnat2 = ["rovaniemi", "oulu", "kuopio", "joensuu", "vaasa", "jyväskylä", "tampere", "pori", "hämeenlinna", "lappeenranta", "vantaa", "turku", "espoo", "helsinki"]
+
+
+#Matka sanakirjan nimestä avaimen nimeen (km). Esim rovaniemi - oulu matka on 221km
+rovaniemi = {"oulu":"221", "kuopio":"506", "joensuu":"549", "vaasa":"539", "jyväskylä":"559", "tampere":"709", "pori":"728", "hämeenlinna":"749", "lappeenranta":"781", "vantaa":"827", "turku":"869", "espoo":"840", "helsinki":"860"}
+oulu = {"rovaniemi":"221", "kuopio":"287", "joensuu":"329", "vaasa":"319", "jyväskylä":"32", "tampere":"489", "pori":"508", "hämeenlinna":"529", "lappeenranta":"561", "vantaa":"607", "turku":"649", "espoo":"620", "helsinki":"640"}
+kuopio = {"oulu":"287", "rovaniemi":"506", "joensuu":"136", "vaasa":"337", "jyväskylä":"148", "tampere":"296", "pori":"410", "hämeenlinna":"368", "lappeenranta":"271", "vantaa":"392", "turku":"456", "espoo":"404", "helsinki":"392"}
+joensuu = {"oulu":"329", "kuopio":"136", "rovaniemi":"549", "vaasa":"492", "jyväskylä":"247", "tampere":"395", "pori":"510", "hämeenlinna":"410", "lappeenranta":"234", "vantaa":"437", "turku":"596", "espoo":"450", "helsinki":"438"}
+vaasa = {"oulu":"319", "kuopio":"337", "joensuu":"492", "rovaniemi":"539", "jyväskylä":"268", "tampere":"241", "pori":"191", "hämeenlinna":"321", "lappeenranta":"506", "vantaa":"409", "turku":"330", "espoo":"422", "helsinki":"422"}
+jyvaskyla = {"oulu":"329", "kuopio":"148", "joensuu":"247", "vaasa":"268", "rovaniemi":"559", "tampere":"149", "pori":"264", "hämeenlinna":"189", "lappeenranta":"224", "vantaa":"269", "turku":"309", "espoo":"282", "helsinki":"270"}
+tampere = {"oulu":"489", "kuopio":"296", "joensuu":"395", "vaasa":"241", "jyväskylä":"149", "rovaniemi":"709", "pori":"110", "hämeenlinna":"79", "lappeenranta":"277", "vantaa":"166", "turku":"164", "espoo":"180", "helsinki":"179"}
+pori = {"oulu":"508", "kuopio":"410", "joensuu":"510", "vaasa":"191", "jyväskylä":"264", "tampere":"110", "rovaniemi":"728", "hämeenlinna":"186", "lappeenranta":"389", "vantaa":"223", "turku":"140", "espoo":"227", "helsinki":"245"}
+hameenlinna = {"oulu":"749", "kuopio":"368", "joensuu":"410", "vaasa":"321", "jyväskylä":"189", "tampere":"79", "pori":"186", "rovaniemi":"749", "lappeenranta":"220", "vantaa":"89", "turku":"145", "espoo":"102", "helsinki":"102"}
+lappeenranta = {"oulu":"561", "kuopio":"271", "joensuu":"234", "vaasa":"506", "jyväskylä":"224", "tampere":"277", "pori":"389", "hämeenlinna":"220", "rovaniemi":"781", "vantaa":"227", "turku":"385", "espoo":"237", "helsinki":"225"}
+vantaa = {"oulu":"607", "kuopio":"392", "joensuu":"437", "vaasa":"409", "jyväskylä":"269", "tampere":"166", "pori":"223", "hämeenlinna":"89", "lappeenranta":"227", "rovaniemi":"827", "turku":"161", "espoo":"16", "helsinki":"19"}
+turku = {"oulu":"649", "kuopio":"456", "joensuu":"596", "vaasa":"330", "jyväskylä":"309", "tampere":"164", "pori":"140", "hämeenlinna":"145", "lappeenranta":"385", "vantaa":"161", "rovaniemi":"869", "espoo":"150", "helsinki":"168"}
+espoo = {"oulu":"620", "kuopio":"404", "joensuu":"450", "vaasa":"422", "jyväskylä":"282", "tampere":"180", "pori":"227", "hämeenlinna":"102", "lappeenranta":"237", "vantaa":"16", "turku":"150", "rovaniemi":"840", "helsinki":"21"}
+helsinki = {"oulu":"640", "kuopio":"392", "joensuu":"438", "vaasa":"422", "jyväskylä":"270", "tampere":"179", "pori":"245", "hämeenlinna":"102", "lappeenranta":"225", "vantaa":"19", "turku":"168", "espoo":"21", "rovaniemi":"860"}
+
+
+
+#print(helsinki["pori"])
