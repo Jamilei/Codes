@@ -1,0 +1,194 @@
+#9.12.2012 Jami Leivo
+
+#importataan sanakirjat tiedostosta paikkakuntasanakirja
+#import * importtaa kaikki sanakirjat ja jokaista ei tarvitse erikseen hakea
+from paikkakuntasanakirja import *
+#luokka
+import ajotoimenpiteet
+import pickle
+
+def main():
+
+    oma_ajo = ajotoimenpiteet.Ajotoimenpiteet("", "")
+    try:
+        edellinenajo = open("Ajokokemukset.dat", "wb")
+        tiedosto = pickle.load(edellinenajo)
+        tiedosto.close()
+    except:
+        tiedosto = {}
+    
+
+
+
+
+    try:
+        print("\t---Tervetuloa---")
+        input("Etene syöttamalla pyydettyja numeroita - paina entteria jatkaaksesi")
+    
+        #kayttöohjeissa lukee mita ohjelma tekee, sita ei seliteta kaytön yhteydessa
+        print("Muistithan lukea kayttöohjeen?")
+        print("--------------------------------------")
+        valinta = 0
+        valinta=int(input("Haluatko aloittaa matkan (1) vai sammuttaa ohjelman (2)\t"))
+        if valinta == 1:
+            print("Tama ohjelma kayttaa paikkakuntia:\n")
+            for i in paikkakunnat:
+                print(str.capitalize(i))
+            print("-----------")
+
+        
+            mpituus=alustajaohjelma()
+            #ajovaihe() ohjelman kutsu
+            a=ajovaihe(mpituus)
+
+        elif valinta == 2:
+            print("\tSammutetaan..")
+            print("\t------------")
+
+        print("-----------------")    
+        print("Kiitos kaytösta")
+
+    except:
+        print("Jotain meni vikaan, palataan alkuun")
+        main()
+
+def alustajaohjelma():
+    #picklen kayttö
+    try:
+        edellinenajo = open("ajokokemukset.dat", "rb")
+        tiedosto = pickle.load(edellinenajo)
+        tiedosto.close()
+    except:
+        tiedosto = {}
+
+
+    try:
+
+
+        
+        oma_ajo = ajotoimenpiteet.Ajotoimenpiteet("", "")
+        aloitus=int(input("Valitse lahtöpaikkakunta\t"))
+
+
+        #Tiedostoon kirjoittamista varten
+        dump = paikkakunnat2[aloitus]
+        
+
+        #kts. paikkakuntasanakirja - def valinta() - kommentit
+        aloitus = oma_ajo.valinta(aloitus)
+
+        
+        print("\t---------------")
+        print("Pystyt matkaamaan seuraaviin paikkoihin \n")
+        for i in paikkakunnat:
+            print(str.capitalize(i))
+        lopetus = int(input("Minne matkustetaan?\t"))
+
+        #kaytetaan funktiota stringin(paikkakunnan) valitsemiseen
+        lopetus2 = oma_ajo.valinta2(lopetus)
+
+        #tehdaan muuttuja etta saa helposti printattua
+        matkanpituus = aloitus[lopetus2]
+        print("Ajomatkan pituus:", matkanpituus, "km")
+
+
+
+               
+        #Kirjoittaa tiedostoon ajokerran lahtö- seka maaranpaan.
+        tiedosto = open("ajokokemukset.dat", "wb")  
+        dump = dump + lopetus2
+        pickle.dump(dump, tiedosto)
+        tiedosto.close()
+
+        
+
+        #kaytetaan kohdassa def(ajovaihe)
+        return matkanpituus
+
+    except:
+        print("Jotain meni vikaan, palataan alkuun")
+        alustajaohjelma()
+
+
+#Tama simuloi ajotaivalta
+def ajovaihe(matkanpituus):
+    oma_ajo = ajotoimenpiteet.Ajotoimenpiteet("", matkanpituus)
+    ehto = 0
+    while ehto == 0:
+        print("--------------")
+        print("Aloitetaan matka")
+        print("Matkaa on", matkanpituus, "Km")
+        bensanmaara = int(input("Paljonko bensaa on lahtökohtaisesti? (anna tasalitroina)\t"))
+        oma_ajo.set_bensa(bensanmaara)
+        bensanM = oma_ajo.get_bensa()
+
+
+        inputti = 0
+
+        while inputti == 0:
+            inputti = int(input("--------------------\n" \
+                                "Valitse numeroilla mita haluat tehda\n" \
+                                "Ajetaan eteenpain (1)\n" \
+                                "Tarkistetaan bensanmaara (2)\n" \
+                                "Tarkistetaan ajomatkan pituus (3)\n" \
+                                "Sulje ohjelma valitsemalla 4\n"))
+                      
+            #vahennetaan matkaa annetun maaran verran, bensakuluu ohella
+            while inputti == 1:
+                print("-----------------")
+                input("Paina entteria kun haluat pitaa tauon.")
+                matkanM = int(input("Kuinka paljon matkaa kului? (Anna tasa-kilometreina)"))
+                #Muutetaan matkanpituus str -> int
+                matkanpituus = oma_ajo.get_ajomatkaa()
+                matkanpituus = int(matkanpituus)
+                #Matkaa kuluu
+                kuluttaja = matkanpituus - matkanM
+                #Muutetaan matkan arvo
+                a = oma_ajo.set_ajomatkaa(kuluttaja)
+
+
+                #bensan kulutus
+                bensanK = matkanM*0.08
+                oma_ajo.vbensaa(bensanK)
+
+                #ajotoimenpiteet modulissa on kohta joka antaa a:n arvoksi
+                # 0 jos ollaan perilla.
+                #muuten jatketaan loppuun
+                if a == 0:
+                    inputti = 0
+
+                else:                    
+                    bensan_lisays = int(input("Oletko tankannut matkan aikana?  1 = Kylla, 2 = En"))
+                    if bensan_lisays == 1:
+                        Bmaara = int(input("Paljonko tankkasit (tasa-litroina)?"))
+                        oma_ajo.lbensaa(Bmaara)
+
+                
+                inputti = 0
+
+
+
+                
+            #palauttaa bensan maaran
+            while inputti == 2:
+                print("-----------------")
+                print("Bensaa on jaljella %.2f" %oma_ajo.get_bensa())
+                inputti = 0
+            #palauttaa matkan maaran
+            while inputti == 3:
+                print("-----------------")
+                print("Matkaa on jaljella", oma_ajo.get_ajomatkaa())
+                inputti = 0
+
+            #lopettaa yllaolevan loopin, siirrytaan takaisin main()iin
+            while inputti == 4:
+                inputti = 5
+            
+        
+
+        ehto = 1
+        
+                
+
+          
+main()
