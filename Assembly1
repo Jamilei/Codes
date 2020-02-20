@@ -1,0 +1,48 @@
+; Simple example
+; Writes Hello World to the output
+
+	JMP start
+jami: DB "Jami Kuopio" ; Variable
+       DB 0	; String terminator
+
+first: DB 02
+       DB 0
+second:DB 06
+       DB 0
+result:DB 0 ;<- tulos tänne
+       DB 0
+
+start:
+	MOV A, [first]    ; Point to var 
+	MOV B, [second]	; Point to var 
+	MOV C, [result]
+	MOV [result], 232	; Point to output
+	CALL addtwo
+        HLT             ; Stop execution
+
+addtwo: 
+    	PUSH A
+    	PUSH B
+    	MOV A, [first]
+    	MOV B, [second]
+    	ADD A, B
+    	MOV C, A
+	POP B
+	POP A
+    	RET 
+
+print:			; print(C:*from, D:*to)
+	PUSH A
+	PUSH B
+	MOV B, 0
+.loop:
+	MOV A, [C]	; Get char from var
+	MOV [D], A	; Write to output
+	INC C
+	INC D  
+	CMP B, [C]	; Check if end
+	JNZ .loop	; jump if not
+
+	POP B
+	POP A
+	RET
