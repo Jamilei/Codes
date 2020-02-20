@@ -1,0 +1,129 @@
+#10.12.2012 Jami Leivo
+from paikkakuntasanakirja import *
+class Ajotoimenpiteet:
+    def __init__(self, bensa, ajomatkaa):
+        self.__bensa = bensa
+        self.__ajomatkaa = ajomatkaa
+
+
+        
+
+
+    def set_bensa(self, bensa):
+        self.__bensa = bensa
+
+    def set_ajomatkaa(self, ajomatkaa):
+        self.__ajomatkaa = ajomatkaa
+        if self.__ajomatkaa <= 0:
+            print("Olet perilla")
+            #pysayttaa loopin mainissa
+            a = 0
+            return a
+        else:
+            print("Matkaa on jaljella", self.__ajomatkaa, "km")
+
+    #korottaa bensan arvoa sille annetun muuttujan maaralla
+    def lbensaa(self, tankattu):
+        self.__bensa = self.__bensa + tankattu
+        print("Tankissasi on", self.__bensa, "litraa")
+        
+    #kuluttaa bensan arvoa sille annetun muuttujan maaralla
+    def vbensaa(self, kulutettu):
+        self.__bensa = self.__bensa - kulutettu
+        #oletetaan etta auto ei voi liikkua ilman bensaa eli
+        #ehtona voi olla <= 0
+        if self.__bensa <= 0:
+            print("Tankkisi on tyhja")
+
+        elif self.__bensa < 10:
+            print("Tankissasi on jalella", self.__bensa, "litraa")
+            print("Tankki on tyhja piakkoin, tankkaa mahdollisimman nopeasti")
+
+        else:
+            print("Tankissasi on jaljella", self.__bensa, "litraa")
+        
+
+    def get_bensa(self):
+        return self.__bensa
+
+    def get_ajomatkaa(self):
+        return self.__ajomatkaa
+
+
+
+    #maarittelee lahtöpaikan mainissa
+    #paikkakuntasanakirja.pyssa on sanakirjoja nimilla
+    #rovaniemi, oulu jnejne..
+    #stringista ei saa muutettua muuttujaksi joten piti tehda
+    #funktio sita varten
+
+    #Aloituspaikan valitsija
+    def valinta(self, a):
+        if a == 0 :
+            a = rovaniemi
+        elif a == 1 :
+            a = oulu
+        elif a == 2 :
+            a = kuopio
+        elif a == 3 :
+            a = joensuu
+        elif a == 4 :
+            a = vaasa
+        elif a == 5 :
+            a = jyvaskyla
+        elif a == 6 :
+            a = tampere
+        elif a == 7 :
+            a = pori
+        elif a == 8 :
+            a = hameenlinna
+        elif a == 9 :
+            a = lappeenranta
+        elif a == 10 :
+            a = vantaa
+        elif a == 11 :
+            a = turku
+        elif a == 12 :
+            a = espoo
+        elif a == 13 :
+            a = helsinki
+
+        return a
+    
+    #kts valinta funktio ylhaalta
+    #muuten sama mutta kayttaa stringia
+    #sanakirjan haku toimii periaatteella
+    #muuttuja["stringipatka"]
+
+    #maaranpaan valitsija
+    def valinta2(self, a):
+        if a == 0 :
+            a = "rovaniemi"
+        elif a == 1 :
+            a = "oulu"
+        elif a == 2 :
+            a = "kuopio"
+        elif a == 3 :
+            a = "joensuu"
+        elif a == 4 :
+            a = "vaasa"
+        elif a == 5 :
+            a = "jyvaskyla"
+        elif a == 6 :
+            a = "tampere"
+        elif a == 7 :
+            a = "pori"
+        elif a == 8 :
+            a = "hameenlinna"
+        elif a == 9 :
+            a = "lappeenranta"
+        elif a == 10 :
+            a = "vantaa"
+        elif a == 11 :
+            a = "turku"
+        elif a == 12 :
+            a = "espoo"
+        elif a == 13 :
+            a = "helsinki"
+
+        return a
