@@ -1,0 +1,87 @@
+/**
+ * @(#)Puu.java
+ *
+ *
+ * @author Jami Leivo
+ * @version 1.00 2013/10/9
+ */
+public class Puu {
+
+        public Node root;
+
+        public Puu(){
+                root=null;
+        }
+
+
+        public boolean insert(Node parent, int k){
+                if (root == null){
+                        root = new Node(k);
+                        return true;
+                }
+
+                else {
+                        if (k < parent.key){
+                                if (parent.left == null){
+                                        parent.left = new Node(k);
+                                        parent.left.p = parent;
+                                        return true;
+                                }
+
+                                else{
+                                        parent = parent.left;
+                                        return (insert(parent, k));
+                                }
+
+                        }
+
+                        else{
+                                if (parent.right == null){
+                                        parent.right = new Node(k);
+                                        parent.right.p = parent;
+                                        return false;
+                                }
+
+                                else{
+                                        parent = parent.right;
+                                        return (insert(parent, k));
+                                }
+                        }
+                }
+        }
+
+            
+            
+    public boolean search(Node x, int k){
+        if (x == null){
+                return false;
+        }
+
+        else if(x.key == k){
+                return true;
+        }
+
+        else if(k < x.key){
+                return search(x.left, k);
+        }
+
+        else{
+                return search(x.right, k);
+        }
+    }
+
+        
+
+    public static void main(String[] args) {
+        Puu puu = new Puu();
+     	Node yks = new Node(1);
+        Node nega = new Node(-1);
+        Node kaks = new Node(2);
+        Node miinus = new Node (-2);
+        
+        System.out.println(puu.insert(puu.root, 2));
+        System.out.println(puu.insert(puu.root, 1));
+        System.out.println(puu.insert(puu.root, 4));
+        System.out.println(puu.insert(puu.root, 5));
+    }
+}
