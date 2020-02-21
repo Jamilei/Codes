@@ -1,0 +1,211 @@
+//L293D
+//Jami Leivo
+
+//moottori A
+const int motorA_pin1 = 10;  // Pin 2 L293
+const int motorA_pin2 = 9;  // Pin 7 L293
+const int motorA_ctrl = 3; // PWM, Pin 1 L293 
+
+//moottori B
+const int motorB_pin1  = 5; // Pin 10 L293
+const int motorB_pin2  = 6; // Pin 15 L293
+const int motorB_ctrl = 11; // PWV, Pin 9 L293
+
+
+//Sensors
+const int frontTrigPin = 24;
+const int frontEchoPin = 25;
+const int frontTrackerPin = 4;
+
+const int rightTrigPin = 26;
+const int rightEchoPin = 27;
+
+const int power = 255;
+const int forwardsDistance = 0;
+const int rightDistance = 0;
+
+void setup() {
+    Serial.begin(9600);
+    // Asetetaan pinnien tila
+    pinMode(motorA_pin1, OUTPUT);
+    pinMode(motorA_pin2, OUTPUT);
+    pinMode(motorA_ctrl, OUTPUT);
+    pinMode(motorB_pin1, OUTPUT);
+    pinMode(motorB_pin2, OUTPUT);
+    pinMode(motorB_ctrl, OUTPUT);
+
+    pinMode(frontTrigPin, OUTPUT);
+  pinMode(frontEchoPin, INPUT);
+
+  pinMode(rightTrigPin, OUTPUT);
+  pinMode(rightEchoPin, INPUT);
+
+    analogWrite(motorA_ctrl, power);
+    analogWrite(motorB_ctrl, power);
+    
+}
+
+
+void loop() {
+  if (Serial.available()){
+    readCommandFromSerial();
+  }
+  
+  if (checkRight()){
+    stoperinos();
+    turnRight();
+    driveForward();
+  }
+  else if (getFrontDistance() < 10){
+    wallAhead();
+  }
+  //getFinishLine();
+  
+}
+
+void readCommandFromSerial(){
+  char command = Serial.read();
+    switch (command){
+      case ('w'):
+        driveForward();
+        break;
+      case ('s'):
+        reverse();
+        break;
+      case ('a'):
+        turnLeft();
+        break;
+      case ('d'):
+        turnRight();
+        break;
+      case ('e'):
+        stoperinos();
+        break;
+    }
+}
+void wallAhead(){
+    turnAround();
+    driveForward();
+}
+
+bool checkRight(){
+  //ota lukema
+  //jos seinä edessä, palauta false
+  if (getRightDistance() < 10)
+    return false;
+  else
+    return true;
+}
+
+void turnLeft(){
+  stoperinos();
+  setAForward();
+  setBForward();
+  delay(300);
+  stoperinos();
+}
+
+void turnRight(){
+  stoperinos();
+  setAReverse();
+  setBReverse();
+  delay(300);
+  stoperinos();
+}
+
+void reverse(){
+  stoperinos();
+  setBReverse();
+  setAForward();
+}
+
+void driveForward(){
+  stoperinos();
+  setAReverse();
+  setBForward();
+}
+
+void turnAround(){
+  Serial.println("Turning around...");
+  turnLeft();
+  delay(1000);
+  stoperinos();
+}
+
+void stoperinos(){
+    digitalWrite(motorA_pin1, LOW);
+    digitalWrite(motorA_pin2, LOW);
+    digitalWrite(motorB_pin1, LOW);
+    digitalWrite(motorB_pin2, LOW);
+}
+
+
+int getFrontDistance(){
+  long duration, distance;
+  digitalWrite(frontTrigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(frontTrigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(frontTrigPin, LOW);
+  duration = pulseIn(frontEchoPin, HIGH);
+  distance = (duration/2) / 29.1;
+  delay(500);
+  if (distance >= 200 || distance <= 0){
+    Serial.println("Front out of range");
+    return 10000;
+  }
+  else {
+    Serial.println(distance);
+    return distance;
+  }
+}
+
+int getRightDistance(){
+  long duration, distance;
+  digitalWrite(rightTrigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(rightTrigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(rightTrigPin, LOW);
+  duration = pulseIn(rightEchoPin, HIGH);
+  distance = (duration/2) / 29.1;
+  delay(500);
+  if (distance >= 200 || distance <= 0){
+    Serial.println("Right out of range");
+    return 10000;
+  }
+  else {
+    Serial.println(distance);
+    return distance;
+  }
+  
+}
+
+
+
+void getFinishLine(){
+  int finish = digitalRead(frontTrackerPin);
+  if (finish == 1)
+    stoperinos();
+}
+
+void setAReverse(){
+    digitalWrite(motorA_pin1, HIGH);
+    digitalWrite(motorA_pin2, LOW);
+}
+
+void setAForward(){
+    digitalWrite(motorA_pin1, LOW);
+    digitalWrite(motorA_pin2, HIGH);
+}
+
+void setBReverse(){
+    digitalWrite(motorB_pin1, LOW);
+    digitalWrite(motorB_pin2, HIGH);
+}
+
+void setBForward(){
+    digitalWrite(motorB_pin1, HIGH);
+    digitalWrite(motorB_pin2, LOW);
+}
+
