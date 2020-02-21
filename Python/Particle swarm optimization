@@ -1,0 +1,169 @@
+#Jami Leivo
+#10/2019
+#done and tested with python 2.7.10
+
+#imports - random for random factor, and matplotlib for visualization 
+import random
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+
+#algorithm used in this assigment what the swarm tries to 'optimize' (what value of x returns 0)
+def funktio(x):
+    arvo=0
+    for i in range(len(x)):
+        #x[i] to the power of even numbers so the result stays positive
+        arvo = arvo + x[i]**4
+    return arvo
+
+
+class Partikkeli:
+
+    #definement of particles
+    def __init__(self, lahtocord):
+
+        #defining all the information 1 particle knows. The 'memory' of the particle
+        self.nykpaikka = []         
+        self.nopeus = []
+        self.omaparas = []
+        self.globaaliparas = []
+        self.nykyinenparas = []
+
+        #defining the velocity for the particle (random so the swarm goes in differend directions - removing determinicity) and the starting position which is same for every particle
+        for i in range(0, num_dimensions):
+            self.nopeus.append(random.uniform(-1, 1))
+            self.nykpaikka.append(lahtocord[i])
+
+    #movement
+    def paivita_koord(self):
+        #for every particle in swarm
+        for i in range(0, num_dimensions):
+            #current position is affected by the velocity
+            #print type(self.nopeus)
+            self.nykpaikka[i] = self.nykpaikka[i] + self.nopeus[i]
+
+            #if the new position is out of range (out of boundaries defined previously) then the particle is moved to the edge
+            #this could be done differently such as 'bouncing' the particle when it collides with the boundaries
+            #Y and
+            if self.nykpaikka[i]>reunat[i][1]:
+                self.nykpaikka[i]=reunat[i][1]
+            #X
+            if self.nykpaikka[i] < reunat[i][0]:
+                self.nykpaikka[i]=reunat[i][0]
+
+    #velocity update
+    def paivita_nopeus(self, porukan_positio):
+        #defining the weights that the particles and swarm has - more information in the report
+        oma_paino = 1
+        yleinen_paino = 3
+        vakio_paino = 0.5
+
+        #updating velocity for each particle (every particle gets new velocity at the same time -> at the end of movement)
+        for i in range(0, num_dimensions):
+            #random factor for the velocities so that the swarm is able to explore new spaces - also means that every run is different (nondeterministic)
+            random1 = random.random()
+            random2 = random.random()
+
+            #calculating new velocity based on individual and swarm weights
+            #i found few solutions for this and i chose this because i understood it more easily
+            #another version that could have been used found in the report
+            oma_nopeus = oma_paino * random1 * (self.omaparas[i] - self.nykpaikka[i])
+            yleinen_nopeus = yleinen_paino * random2 * (porukan_positio[i] - self.nykpaikka[i])
+            self.nopeus[i] = vakio_paino * self.nopeus[i] + yleinen_nopeus + oma_nopeus
+
+    #updating the particle
+    def vertaa(self, funktio):
+        self.nykyinenparas = funktio(self.nykpaikka)
+        #print self.nykpaikka
+        #print self.nykyinenparas
+        #comparing if the particle has found a better position that it has had previously found (-1 is for the 1st cycle only)
+        if self.nykyinenparas < self.globaaliparas or self.globaaliparas == -1:
+            self.omaparas = self.nykpaikka
+            self.globaaliparas = self.nykyinenparas
+
+
+class PSO():
+    def __init__(self, funktio, paikka, reunat, p_maara, maxiteraatiot):
+
+        #definements for the particle swarm optimization
+        self.iteraatiot = 0
+        self.maxiteraatiot = maxiteraatiot
+        self.p_maara = p_maara
+        self.reunat = reunat
+        self.funktio = funktio
+        self.porukan_paras = -1
+        self.porukan_positio = []
+
+        #how many dimensions the data has: x, y, z... - usually 2
+        #print len(paikka)
+        global num_dimensions
+        num_dimensions = len(paikka)
+
+        #creating the swarm, gets the number of particles and position where the swarm starts it search
+        self.parvi = []
+        for i in range(0, p_maara):
+            self.parvi.append(Partikkeli(paikka))
+        i = 0
+
+    def paivita(self, scat):
+        #iterating as many times as defined previously (more iterations = more time for the algortithm = more accurate result)
+        if(self.iteraatiot < self.maxiteraatiot):
+            #best value meaning the best position the swarm has found at this point - printed for each iteration
+            print 'Run number:', self.iteraatiot, '. Best value found in this iteration: ', self.porukan_paras
+
+            #if you want to see the swarm moving slower
+            #time.sleep(1)
+
+            #cheching if the current position(s) is better than previously found best 
+            for j in range(0, self.p_maara):
+                self.parvi[j].vertaa(self.funktio)
+                #if we find a better position
+                if self.parvi[j].nykyinenparas < self.porukan_paras or self.porukan_paras == -1:
+                    self.porukan_paras = float(self.parvi[j].nykyinenparas)
+                    self.porukan_positio = list(self.parvi[j].nykpaikka)
+                    
+            #definements for the visualization
+            parvi_xkoord = []
+            parvi_ykoord = []
+
+            #updating the velocity and position for the swarm
+            for j in range(0, self.p_maara):
+                self.parvi[j].paivita_nopeus(self.porukan_positio)
+                self.parvi[j].paivita_koord()
+
+                #getting the new coordinates for the swarm (used for visualization)
+                parvi_xkoord.append(self.parvi[j].nykpaikka[0])
+                parvi_ykoord.append(self.parvi[j].nykpaikka[1])
+
+            #deleting the previous swarm from the plot
+            plt.clf()
+
+            #new swarm positions plotted
+            plt.scatter(parvi_xkoord, parvi_ykoord)
+            
+            #creating the x and y max for the visualization based on previously defined boundaries
+            plt.xlim(self.reunat[0])
+            plt.ylim(self.reunat[1])
+
+            #iteration number goes up
+            self.iteraatiot = self.iteraatiot + 1
+
+#defining pso as main
+if __name__ == "__PSO__":
+    main()
+
+#2D boundaries for the swarm, can be tinkered
+reunat = [(-10,10),(-10,10)]
+
+#coordinate where the swarm starts (within the boundaries preferrably, although it works if the swarm starts out of boundary), can be tinkered
+lahtopaikka = [-5, -5]
+
+#starting pso - p_maara is number or particles and maxiteraatiot is number of iterations done
+thisrun = PSO(funktio, lahtopaikka, reunat, p_maara=10, maxiteraatiot=25)
+
+#visualization
+fig = plt.figure()
+ani = animation.FuncAnimation(fig, thisrun.paivita)
+plt.show()
+
+
