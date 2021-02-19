@@ -1,0 +1,44 @@
+SQL-luontikäskyt
+Yhtyeen tulevat sekä menneet keikat. Keikka taulukko liitoksissa taulukkoon ”Tapahtuma”.
+CREATE TABLE KEIKKA(
+Tapahtuma VARCHAR(64) REFERENCES TAPAHTUMA,
+Yhtye VARCHAR(64) REFERENCES YHTYE,
+CONSTRAINT Keikka PRIMARY KEY(Tapahtuma, Yhtye)
+)
+Keikka taulukkoon täydennystä. Luo myös mahdollisuuden festivaaleille.
+CREATE TABLE Tapahtuma(
+Nimi VARCHAR(64) PRIMARY KEY,
+Kaupunki VARCHAR(32),
+Vuosi NUMBER(4)
+)
+
+Yhtyeessä toimivat jäsenet. ”Muusikko-taulukko” täydentää.
+CREATE TABLE JASEN(
+Muusikko VARCHAR(64) REFERENCES MUUSIKKO,
+Yhtye VARCHAR(64) REFERENCES YHTYE,
+Rooli VARCHAR(64),
+CONSTRAINT Jäsen PRIMARY KEY (Muusikko, Yhtye)
+)
+Yhtyeessä toimivat jäsenet määritellään tarkasti tässä taulukossa.
+CREATE TABLE MUUSIKKO(
+Nimi VARCHAR(64) PRIMARY KEY,
+Syntymävuosi NUMBER(4),
+Syntymämaa VARCHAR(32),
+Soittimet VARCHAR(64)
+)
+
+Yhtyeen luoma albumi.
+CREATE TABLE ALBUMI(
+Nimi VARCHAR(64) PRIMARY KEY,
+Artisti VARCHAR(64) REFERENCES YHTYE,
+Julkaisuvuosi NUMBER(4)
+)
+
+Taulukko toimii perustana muille taulukoille. Muut taulukot täydentää erilaisia yhtyeen ominaisuuksia.
+CREATE TABLE YHTYE(
+CREATE TABLE Tapahtuma(
+Nimi VARCHAR(64) PRIMARY KEY,
+Kaupunki VARCHAR(32),
+Vuosi NUMBER(4)
+)
+
